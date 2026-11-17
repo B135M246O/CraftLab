@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-# from recipes.models import Recipe
 from users.models import Subscription, User
 
 
@@ -18,13 +17,11 @@ class CustomUserSerializer(serializers.ModelSerializer):
         write_only_fields = ('password',)
 
     def get_is_subscribed(self, obj):
-        """Статус подписки на автора."""
         user_id = self.context.get('request').user.id
         return Subscription.objects.filter(
             author=obj.id, user=user_id).exists()
 
     def create(self, validated_data):
-        """Создание нового пользователя."""
         user = User.objects.create(
             email=validated_data['email'],
             username=validated_data['username'],
@@ -54,13 +51,11 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        """Статус подписки на автора."""
         user = self.context.get('request').user
         return Subscription.objects.filter(
             author=obj.author, user=user).exists()
 
     def get_recipes(self, obj):
-        """Получение списка рецептов автора."""
         from recipes.serializers import SmallRecipeSerializer
         limit = self.context.get('request').GET.get('recipes_limit')
         recipe_obj = obj.author.recipes.all()

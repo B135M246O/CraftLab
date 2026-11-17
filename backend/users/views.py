@@ -16,7 +16,6 @@ class CustomUserViewSet(UserViewSet):
     @action(detail=False, url_path='subscriptions',
             url_name='subscriptions', permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
-        """Список авторов, на которых подписан пользователь."""
         user = request.user
         queryset = user.follower.all()
         pages = self.paginate_queryset(queryset)
@@ -27,7 +26,6 @@ class CustomUserViewSet(UserViewSet):
     @action(methods=['post', 'delete'], detail=True, url_path='subscribe',
             url_name='subscribe', permission_classes=[IsAuthenticated])
     def subscribe(self, request, id=None):
-        """Подписка на автора."""
         user = request.user
         author = get_object_or_404(User, id=id)
         if user == author:

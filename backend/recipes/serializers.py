@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 
@@ -48,19 +49,16 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
 
     def get_is_favorited(self, obj):
-        """Статус - рецепт в избранном или нет."""
         user_id = self.context.get('request').user.id
         return Favorite.objects.filter(
             user=user_id, recipe=obj.id).exists()
 
     def get_is_in_shopping_cart(self, obj):
-        """Статус - рецепт в избранном или нет."""
         user_id = self.context.get('request').user.id
         return ShoppingCart.objects.filter(
             user=user_id, recipe=obj.id).exists()
 
     def create_ingredient_amount(self, valid_ingredients, recipe):
-        """Создание уникальных записей: ингредиент - рецепт - количество."""
         for ingredient_data in valid_ingredients:
             ingredient = get_object_or_404(
                 Ingredient, id=ingredient_data.get('id'))
@@ -70,13 +68,12 @@ class RecipeSerializer(serializers.ModelSerializer):
                 amount=ingredient_data.get('amount'))
 
     def create_tags(self, data, recipe):
-        """Отправка на валидацию и создание тэгов у рецепта."""
         valid_tags = validate_tags(data.get('tags'))
         tags = Tag.objects.filter(id__in=valid_tags)
         recipe.tags.set(tags)
 
+    @transaction.atomic
     def create(self, validated_data):
-        """Создание рецепта - writable nested serializers."""
         valid_ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
         self.create_tags(self.initial_data, recipe)
@@ -84,23 +81,24 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def validate(self, data):
-        ingredients = self.initial_data.get('ingredients')
-        valid_ingredients = validate_ingredients(ingredients)
-        data['ingredients'] = valid_ingredients
+        if not self.partial or 'ingredients' in self.initial_data:
+            ingredients = self.initial_data.get('ingredients')
+            data['ingredients'] = validate_ingredients(ingredients)
+        if not self.partial or 'tags' in self.initial_data:
+            validate_tags(self.initial_data.get('tags'))
         return data
 
+    @transaction.atomic
     def update(self, instance, validated_data):
-        """Изменение рецепта - writable nested serializers."""
         instance.name = validated_data.get('name', instance.name)
         instance.image = validated_data.get('image', instance.image)
         instance.text = validated_data.get('text', instance.text)
         instance.cooking_time = validated_data.get(
             'cooking_time', instance.cooking_time)
         instance.save()
-        instance.tags.remove()
-        self.create_tags(self.initial_data, instance)
-        instance.ingredientamount_set.filter(recipe__in=[instance.id]).delete()
-        valid_ingredients = validated_data.get(
-            'ingredients', instance.ingredients)
-        self.create_ingredient_amount(valid_ingredients, instance)
+        if 'tags' in self.initial_data:
+            self.create_tags(self.initial_data, instance)
+        if 'ingredients' in validated_data:
+            instance.ingredientamount_set.all().delete()
+            self.create_ingredient_amount(validated_data['ingredients'], instance)
         return instance

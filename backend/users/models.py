@@ -36,7 +36,6 @@ class User(AbstractUser):
 
 
 class Subscription(models.Model):
-    """Модель для подписок."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -47,10 +46,13 @@ class Subscription(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='following',
-        verbose_name='Автор рецепта',
+        verbose_name='Автор мастер-класса',
     )
 
     class Meta:
+        ordering = ('id',)
+        verbose_name = 'Подписка на мастера'
+        verbose_name_plural = 'Подписки на мастеров'
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'user'],

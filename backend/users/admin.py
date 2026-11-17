@@ -9,14 +9,12 @@ from .models import Subscription, User
 
 
 class CustomUserAdmin(UserAdmin):
-    """Кастомная админка для модели User."""
     search_fields = ('email', 'username')
     list_filter = ('email', 'username')
     ordering = ('pk',)
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    """Кастомная админка для модели Ingredient."""
     list_display = (
         'pk',
         'name',
@@ -28,7 +26,6 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 class TagAdmin(admin.ModelAdmin):
-    """Кастомная админка для модели Tag."""
     list_display = (
         'pk',
         'name',
@@ -45,7 +42,6 @@ class IngredientAmountInline(admin.TabularInline):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    """Кастомная админка для модели Recipe."""
     list_display = (
         'pk',
         'name',
@@ -59,6 +55,7 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('author__username', 'name', 'tags__name')
     empty_value_display = '-пусто-'
 
+    @admin.display(description='В избранном')
     def count_added(self, obj):
         return obj.favorite.count()
 
@@ -100,3 +97,7 @@ admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Favorite, FavoriteShoppingAdmin)
 admin.site.register(ShoppingCart, FavoriteShoppingAdmin)
 admin.site.register(IngredientAmount, IngredientAmountAdmin)
+
+admin.site.site_header = "CraftLab — управление"
+admin.site.site_title = "CraftLab"
+admin.site.index_title = "Мастер-классы и материалы"

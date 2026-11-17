@@ -36,12 +36,12 @@ const Cart = ({ updateOrders, orders }) => {
   return <Main>
     <Container className={styles.container}>
       <MetaTags>
-        <title>Список покупок</title>
-        <meta name="description" content="Продуктовый помощник - Список покупок" />
-        <meta property="og:title" content="Список покупок" />
+        <title>Список материалов</title>
+        <meta name="description" content="CraftLab - Список материалов" />
+        <meta property="og:title" content="Список материалов" />
       </MetaTags>
       <div className={styles.cart}>
-        <Title title='Список покупок' />
+        <Title title='Список материалов' />
         <PurchaseList
           orders={recipes}
           handleRemoveFromCart={handleAddToCart}

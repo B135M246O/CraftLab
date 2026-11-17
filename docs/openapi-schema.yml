@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
-  title: 'Foodgram'
-  version: ''
+  title: 'CraftLab'
+  version: '1.0'
 paths:
   /api/users/:
     get:
@@ -35,13 +35,13 @@ paths:
                     type: string
                     nullable: true
                     format: uri
-                    example: http://foodgram.example.org/api/users/?page=4
+                    example: http://craftlab.example.org/api/users/?page=4
                     description: 'Ссылка на следующую страницу'
                   previous:
                     type: string
                     nullable: true
                     format: uri
-                    example: http://foodgram.example.org/api/users/?page=2
+                    example: http://craftlab.example.org/api/users/?page=2
                     description: 'Ссылка на предыдущую страницу'
                   results:
                     type: array
@@ -111,8 +111,8 @@ paths:
         - Теги
   /api/recipes/:
     get:
-      operationId: Список рецептов
-      description: Страница доступна всем пользователям. Доступна фильтрация по избранному, автору, списку покупок и тегам.
+      operationId: Список мастер-классов
+      description: Страница доступна всем пользователям. Доступна фильтрация по избранному, автору, списку материалов и тегам.
       parameters:
         - name: page
           required: false
@@ -129,28 +129,28 @@ paths:
         - name: is_favorited
           required: false
           in: query
-          description: Показывать только рецепты, находящиеся в списке избранного.
+          description: Показывать только мастер-классы, находящиеся в списке избранного.
           schema:
             type: integer
             enum: [0, 1]
         - name: is_in_shopping_cart
           required: false
           in: query
-          description: Показывать только рецепты, находящиеся в списке покупок.
+          description: Показывать только мастер-классы, находящиеся в списке материалов.
           schema:
             type: integer
             enum: [0, 1]
         - name: author
           required: false
           in: query
-          description: Показывать рецепты только автора с указанным id.
+          description: Показывать мастер-классы только автора с указанным id.
           schema:
             type: integer
         - name: tags
           required: false
           in: query
-          description: Показывать рецепты только с указанными тегами (по slug)
-          example: 'lunch&tags=breakfast'
+          description: Показывать мастер-классы только с указанными тегами (по slug)
+          example: 'decor&tags=knitting'
 
           schema:
             type: array
@@ -171,13 +171,13 @@ paths:
                     type: string
                     nullable: true
                     format: uri
-                    example: http://foodgram.example.org/api/recipes/?page=4
+                    example: http://craftlab.example.org/api/recipes/?page=4
                     description: 'Ссылка на следующую страницу'
                   previous:
                     type: string
                     nullable: true
                     format: uri
-                    example: http://foodgram.example.org/api/recipes/?page=2
+                    example: http://craftlab.example.org/api/recipes/?page=2
                     description: 'Ссылка на предыдущую страницу'
                   results:
                     type: array
@@ -186,11 +186,11 @@ paths:
                     description: 'Список объектов текущей страницы'
           description: ''
       tags:
-        - Рецепты
+        - Мастер-классы
     post:
       security:
         - Token: []
-      operationId: Создание рецепта
+      operationId: Создание мастер-класса
       description: 'Доступно только авторизованному пользователю'
       parameters: []
       requestBody:
@@ -204,7 +204,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecipeList'
-          description: 'Рецепт успешно создан'
+          description: 'Мастер-класс успешно создан'
         '400':
           description: 'Ошибки валидации в стандартном формате DRF'
           content:
@@ -216,13 +216,13 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-        - Рецепты
+        - Мастер-классы
   /api/recipes/download_shopping_cart/:
     get:
       security:
         - Token: [ ]
-      operationId: Скачать список покупок
-      description: 'Скачать файл со списком покупок. Это может быть TXT/PDF/CSV. Важно, чтобы контент файла удовлетворял требованиям задания. Доступно только авторизованным пользователям.'
+      operationId: Скачать список материалов в PDF
+      description: 'Скачать PDF со сводным списком материалов. Количества одинаковых материалов суммируются по всем выбранным мастер-классам. Доступно только авторизованным пользователям.'
       parameters: []
       responses:
         '200':
@@ -232,23 +232,19 @@ paths:
               schema:
                 type: string
                 format: binary
-            text/plain:
-              schema:
-                type: string
-                format: binary
         '401':
           $ref: '#/components/responses/AuthenticationError'
       tags:
-        - Список покупок
+        - Список материалов
   /api/recipes/{id}/:
     get:
-      operationId: Получение рецепта
+      operationId: Получение мастер-класса
       description: ''
       parameters:
         - name: id
           in: path
           required: true
-          description: "Уникальный идентификатор этого рецепта"
+          description: "Уникальный идентификатор этого мастер-класса"
           schema:
             type: string
       responses:
@@ -259,17 +255,17 @@ paths:
                 $ref: '#/components/schemas/RecipeList'
           description: ''
       tags:
-        - Рецепты
+        - Мастер-классы
     patch:
-      operationId: Обновление рецепта
+      operationId: Обновление мастер-класса
       security:
         - Token: [ ]
-      description: 'Доступно только автору данного рецепта'
+      description: 'Доступно только автору данного мастер-класса'
       parameters:
         - name: id
           in: path
           required: true
-          description: "Уникальный идентификатор этого рецепта."
+          description: "Уникальный идентификатор этого мастер-класса."
           schema:
             type: string
       requestBody:
@@ -283,7 +279,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecipeList'
-          description: 'Рецепт успешно обновлен'
+          description: 'Мастер-класс успешно обновлен'
         '400':
           $ref: '#/components/responses/NestedValidationError'
         '401':
@@ -293,23 +289,23 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-        - Рецепты
+        - Мастер-классы
     delete:
-      operationId: Удаление рецепта
+      operationId: Удаление мастер-класса
 
-      description: 'Доступно только автору данного рецепта'
+      description: 'Доступно только автору данного мастер-класса'
       security:
         - Token: [ ]
       parameters:
         - name: id
           in: path
           required: true
-          description: "Уникальный идентификатор этого рецепта"
+          description: "Уникальный идентификатор этого мастер-класса"
           schema:
             type: string
       responses:
         '204':
-          description: 'Рецепт успешно удален'
+          description: 'Мастер-класс успешно удален'
         '401':
           $ref: '#/components/responses/AuthenticationError'
         '403':
@@ -317,10 +313,10 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-        - Рецепты
+        - Мастер-классы
   /api/recipes/{id}/favorite/:
     post:
-      operationId: Добавить рецепт в избранное
+      operationId: Добавить мастер-класс в избранное
       description: 'Доступно только авторизованному пользователю.'
       security:
         - Token: [ ]
@@ -328,7 +324,7 @@ paths:
         - name: id
           in: path
           required: true
-          description: "Уникальный идентификатор этого рецепта"
+          description: "Уникальный идентификатор этого мастер-класса"
           schema:
             type: string
       responses:
@@ -337,9 +333,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecipeMinified'
-          description: 'Рецепт успешно добавлен в избранное'
+          description: 'Мастер-класс успешно добавлен в избранное'
         '400':
-          description: 'Ошибка добавления в избранное (Например, когда рецепт уже есть в избранном)'
+          description: 'Ошибка добавления в избранное (Например, когда мастер-класс уже есть в избранном)'
           content:
             application/json:
               schema:
@@ -350,7 +346,7 @@ paths:
       tags:
         - Избранное
     delete:
-      operationId: Удалить рецепт из избранного
+      operationId: Удалить мастер-класс из избранного
       description: 'Доступно только авторизованным пользователям'
       security:
         - Token: [ ]
@@ -358,14 +354,14 @@ paths:
         - name: id
           in: path
           required: true
-          description: "Уникальный идентификатор этого рецепта."
+          description: "Уникальный идентификатор этого мастер-класса."
           schema:
             type: string
       responses:
         '204':
-          description: 'Рецепт успешно удален из избранного'
+          description: 'Мастер-класс успешно удален из избранного'
         '400':
-          description: 'Ошибка удаления из избранного (Например, когда рецепта там не было)'
+          description: 'Ошибка удаления из избранного (Например, когда мастер-класса там не было)'
           content:
             application/json:
               schema:
@@ -376,7 +372,7 @@ paths:
         - Избранное
   /api/recipes/{id}/shopping_cart/:
     post:
-      operationId: Добавить рецепт в список покупок
+      operationId: Добавить мастер-класс в список материалов
       description: 'Доступно только авторизованным пользователям'
       security:
         - Token: [ ]
@@ -384,7 +380,7 @@ paths:
         - name: id
           in: path
           required: true
-          description: "Уникальный идентификатор этого рецепта."
+          description: "Уникальный идентификатор этого мастер-класса."
           schema:
             type: string
       responses:
@@ -393,9 +389,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecipeMinified'
-          description: 'Рецепт успешно добавлен в список покупок'
+          description: 'Мастер-класс успешно добавлен в список материалов'
         '400':
-          description: 'Ошибка добавления в список покупок (Например, когда рецепт уже есть в списке покупок)'
+          description: 'Ошибка добавления в список материалов (Например, когда мастер-класс уже есть в списке материалов)'
           content:
             application/json:
               schema:
@@ -403,9 +399,9 @@ paths:
         '401':
           $ref: '#/components/responses/AuthenticationError'
       tags:
-        - Список покупок
+        - Список материалов
     delete:
-      operationId: Удалить рецепт из списка покупок
+      operationId: Удалить мастер-класс из списка материалов
       description: 'Доступно только авторизованным пользователям'
       security:
         - Token: [ ]
@@ -413,14 +409,14 @@ paths:
         - name: id
           in: path
           required: true
-          description: "Уникальный идентификатор этого рецепта."
+          description: "Уникальный идентификатор этого мастер-класса."
           schema:
             type: string
       responses:
         '204':
-          description: 'Рецепт успешно удален из списка покупок'
+          description: 'Мастер-класс успешно удален из списка материалов'
         '400':
-          description: 'Ошибка удаления из списка покупок (Например, когда рецепта там не было)'
+          description: 'Ошибка удаления из списка материалов (Например, когда мастер-класса там не было)'
           content:
             application/json:
               schema:
@@ -428,7 +424,7 @@ paths:
         '401':
           $ref: '#/components/responses/AuthenticationError'
       tags:
-        - Список покупок
+        - Список материалов
   /api/users/{id}/:
     get:
       operationId: Профиль пользователя
@@ -476,7 +472,7 @@ paths:
   /api/users/subscriptions/:
     get:
       operationId: Мои подписки
-      description: 'Возвращает пользователей, на которых подписан текущий пользователь. В выдачу добавляются рецепты.'
+      description: 'Возвращает пользователей, на которых подписан текущий пользователь. В выдачу добавляются мастер-классы.'
       parameters:
         - name: page
           required: false
@@ -511,13 +507,13 @@ paths:
                     type: string
                     nullable: true
                     format: uri
-                    example: http://foodgram.example.org/api/users/subscriptions/?page=4
+                    example: http://craftlab.example.org/api/users/subscriptions/?page=4
                     description: 'Ссылка на следующую страницу'
                   previous:
                     type: string
                     nullable: true
                     format: uri
-                    example: http://foodgram.example.org/api/users/subscriptions/?page=2
+                    example: http://craftlab.example.org/api/users/subscriptions/?page=2
                     description: 'Ссылка на предыдущую страницу'
                   results:
                     type: array
@@ -597,13 +593,13 @@ paths:
         - Подписки
   /api/ingredients/:
     get:
-      operationId: Список ингредиентов
-      description: 'Список ингредиентов с возможностью поиска по имени.'
+      operationId: Список материалов
+      description: 'Список материалов с возможностью поиска по имени.'
       parameters:
         - name: name
           required: false
           in: query
-          description: Поиск по частичному вхождению в начале названия ингредиента.
+          description: Поиск по частичному вхождению в начале названия материала.
           schema:
             type: integer
       responses:
@@ -616,11 +612,11 @@ paths:
                   $ref: '#/components/schemas/Ingredient'
           description: ''
       tags:
-        - Ингредиенты
+        - Материалы
   /api/ingredients/{id}/:
     get:
-      operationId: Получение ингредиента
-      description: 'Уникальный идентификатор этого ингредиента.'
+      operationId: Получение материала
+      description: 'Уникальный идентификатор этого материала.'
       parameters:
         - name: id
           in: path
@@ -636,7 +632,7 @@ paths:
                 $ref: '#/components/schemas/Ingredient'
           description: ''
       tags:
-        - Ингредиенты
+        - Материалы
   /api/users/set_password/:
     post:
       operationId: Изменение пароля
@@ -698,7 +694,7 @@ paths:
 components:
   schemas:
     User:
-      description:  'Пользователь (В рецепте - автор рецепта)'
+      description:  'Пользователь (В мастер-классе - автор мастер-класса)'
       type: object
       properties:
         email:
@@ -718,12 +714,12 @@ components:
           type: string
           maxLength: 150
           description: "Имя"
-          example: "Вася"
+          example: "Мастер"
         last_name:
           type: string
           maxLength: 150
           description: "Фамилия"
-          example: "Пупкин"
+          example: "Рукоделия"
         is_subscribed:
           type: boolean
           readOnly: true
@@ -732,7 +728,7 @@ components:
       required:
         - username
     UserWithRecipes:
-      description: 'Расширенный объект пользователя с рецептами'
+      description: 'Расширенный объект пользователя с мастер-классами'
       type: object
       properties:
         email:
@@ -752,12 +748,12 @@ components:
           type: string
           maxLength: 150
           description: "Имя"
-          example: "Вася"
+          example: "Мастер"
         last_name:
           type: string
           maxLength: 150
           description: "Фамилия"
-          example: "Пупкин"
+          example: "Рукоделия"
         is_subscribed:
           type: boolean
           readOnly: true
@@ -768,7 +764,7 @@ components:
             $ref: '#/components/schemas/RecipeMinified'
         recipes_count:
           type: integer
-          description: 'Общее количество рецептов пользователя'
+          description: 'Общее количество мастер-классов пользователя'
 
     Tag:
       type: object
@@ -780,7 +776,7 @@ components:
           type: string
           maxLength: 200
           description: 'Название'
-          example: 'Завтрак'
+          example: 'Вязание'
         color:
           type: string
           nullable: true
@@ -793,7 +789,7 @@ components:
           maxLength: 200
           pattern: ^[-a-zA-Z0-9_]+$
           description: 'Уникальный слаг'
-          example: 'breakfast'
+          example: 'knitting'
     RecipeList:
       type: object
       properties:
@@ -809,7 +805,7 @@ components:
         author:
           $ref: '#/components/schemas/User'
         ingredients:
-          description: 'Список ингредиентов'
+          description: 'Список материалов'
           type: array
           items:
             $ref: '#/components/schemas/IngredientInRecipe'
@@ -818,21 +814,21 @@ components:
           description: 'Находится ли в избранном'
         is_in_shopping_cart:
           type: boolean
-          description: 'Находится ли в корзине'
+          description: 'Включён ли мастер-класс в список материалов'
         name:
           type: string
           maxLength: 200
           description: 'Название'
         image:
           description: 'Ссылка на картинку на сайте'
-          example: 'http://foodgram.example.org/media/recipes/images/image.jpeg'
+          example: 'http://craftlab.example.org/media/recipes/images/image.jpeg'
           type: string
           format: url
         text:
           description: 'Описание'
           type: string
         cooking_time:
-          description: 'Время приготовления (в минутах)'
+          description: 'Время выполнения (в минутах)'
           type: integer
           minimum: 1
       required:
@@ -857,11 +853,11 @@ components:
           description: 'Название'
         image:
           description: 'Ссылка на картинку на сайте'
-          example: 'http://foodgram.example.org/media/recipes/images/image.jpeg'
+          example: 'http://craftlab.example.org/media/recipes/images/image.jpeg'
           type: string
           format: url
         cooking_time:
-          description: 'Время приготовления (в минутах)'
+          description: 'Время выполнения (в минутах)'
           type: integer
           minimum: 1
     Ingredient:
@@ -873,11 +869,11 @@ components:
         name:
           type: string
           maxLength: 200
-          example: 'Капуста'
+          example: 'Хлопковая пряжа'
         measurement_unit:
           type: string
           maxLength: 200
-          example: 'кг'
+          example: 'м'
       required:
         - name
         - measurement_unit
@@ -891,12 +887,12 @@ components:
           type: string
           maxLength: 200
           description: 'Название'
-          example: 'Картофель отварной'
+          example: 'Шнур хлопковый'
         measurement_unit:
           type: string
           maxLength: 200
           description: 'Единицы измерения'
-          example: 'г'
+          example: 'м'
         amount:
           type: integer
           description: 'Количество'
@@ -913,7 +909,7 @@ components:
           format: email
           maxLength: 254
           description: "Адрес электронной почты"
-          example: "vpupkin@yandex.ru"
+          example: "maker@example.org"
         id:
           type: integer
           readOnly: true
@@ -922,17 +918,17 @@ components:
           description: "Уникальный юзернейм"
           pattern: ^[\w.@+-]+\z
           maxLength: 150
-          example: "vasya.pupkin"
+          example: "craft.maker"
         first_name:
           type: string
           maxLength: 150
           description: "Имя"
-          example: "Вася"
+          example: "Мастер"
         last_name:
           type: string
           maxLength: 150
           description: "Фамилия"
-          example: "Пупкин"
+          example: "Рукоделия"
         password:
           type: string
           maxLength: 150
@@ -952,7 +948,7 @@ components:
           format: email
           maxLength: 254
           description: "Адрес электронной почты"
-          example: "vpupkin@yandex.ru"
+          example: "maker@example.org"
         id:
           type: integer
           readOnly: true
@@ -961,17 +957,17 @@ components:
           description: "Уникальный юзернейм"
           pattern: ^[\w.@+-]+\z
           maxLength: 150
-          example: "vasya.pupkin"
+          example: "craft.maker"
         first_name:
           type: string
           maxLength: 150
           description: "Имя"
-          example: "Вася"
+          example: "Мастер"
         last_name:
           type: string
           maxLength: 150
           description: "Фамилия"
-          example: "Пупкин"
+          example: "Рукоделия"
       required:
         - username
         - first_name
@@ -1055,7 +1051,7 @@ components:
           type: integer
           readOnly: true
         ingredients:
-          description: Список ингредиентов
+          description: Список материалов
           type: array
           items:
             example:
@@ -1067,7 +1063,7 @@ components:
                 description: 'Уникальный id'
                 type: integer
               amount:
-                description: 'Количество в рецепте'
+                description: 'Количество в мастер-классе'
                 type: integer
             required:
               - id
@@ -1091,7 +1087,7 @@ components:
           description: 'Описание'
           type: string
         cooking_time:
-          description: 'Время приготовления (в минутах)'
+          description: 'Время выполнения (в минутах)'
           type: integer
           minimum: 1
       required:
@@ -1117,7 +1113,7 @@ components:
       type: object
       properties:
         ingredients:
-          description: 'Ошибки в ингредиентах. В приведенном примере в первом и третьем ингредиенте не было ошибок (amount >= 1), а во втором были.'
+          description: 'Ошибки в материалах. В приведенном примере в первом и третьем материале не было ошибок (amount >= 1), а во втором были.'
           example: [{},{"amount":["Убедитесь, что это значение больше либо равно 1."]}, {}]
           type: array
           items:

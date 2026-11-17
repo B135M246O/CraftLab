@@ -1,6 +1,6 @@
 export default [
   {
-    title: 'Рецепты',
+    title: 'Мастер-классы',
     href: '/recipes',
     auth: false
   },{
@@ -8,7 +8,7 @@ export default [
     href: '/subscriptions',
     auth: true
   },{
-    title: 'Создать рецепт',
+    title: 'Создать мастер-класс',
     href: '/recipes/create',
     auth: true
   },{
@@ -16,7 +16,7 @@ export default [
     href: '/favorites',
     auth: true
   }, {
-    title: 'Список покупок',
+    title: 'Список материалов',
     href: '/cart',
     auth: true
   }

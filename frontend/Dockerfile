@@ -1,8 +1,7 @@
-# build env
-FROM node:13.12.0-alpine as build
+FROM node:22-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci --legacy-peer-deps --no-audit --no-fund
 COPY . ./
 RUN npm run build
-CMD cp -r build result_build
+CMD ["sh", "-c", "cp -r build/. /result/"]

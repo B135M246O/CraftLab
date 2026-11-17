@@ -1,10 +1,10 @@
+from rest_framework import serializers
 from rest_framework.validators import ValidationError as RFError
 
 from tags_ingr.models import Ingredient, Tag
 
 
 def validate_time(value):
-    """Валидация поля модели - время приготовления."""
     if value < 1:
         raise RFError(
             ['Время не может быть менее минуты.']
@@ -12,30 +12,32 @@ def validate_time(value):
 
 
 def validate_ingredients(data):
-    """Валидация ингредиентов и количества."""
     if not data:
         raise RFError({'ingredients': ['Обязательное поле.']})
-    if len(data) < 1:
-        raise RFError({'ingredients': ['Не переданы ингредиенты.']})
-    unique_ingredient = []
+    if not isinstance(data, list):
+        raise RFError({'ingredients': ['Ожидается список материалов.']})
+    unique_ingredients = set()
+    normalized = []
+    integer = serializers.IntegerField(min_value=1)
     for ingredient in data:
-        if not ingredient.get('id'):
-            raise RFError({'ingredients': ['Отсутствует id ингредиента.']})
-        id = ingredient.get('id')
-        if not Ingredient.objects.filter(id=id).exists():
-            raise RFError({'ingredients': ['Ингредиента нет в БД.']})
-        if id in unique_ingredient:
-            raise RFError(
-                {'ingredients': ['Нельзя дублировать имена ингредиентов.']})
-        unique_ingredient.append(id)
-        amount = int(ingredient.get('amount'))
-        if amount < 1:
-            raise RFError({'amount': ['Количество не может быть менее 1.']})
-    return data
+        if not isinstance(ingredient, dict):
+            raise RFError({'ingredients': ['Ожидается объект материала.']})
+        try:
+            ingredient_id = integer.run_validation(ingredient.get('id'))
+            amount = integer.run_validation(ingredient.get('amount'))
+        except RFError as exc:
+            raise RFError({'ingredients': exc.detail}) from exc
+        if not Ingredient.objects.filter(id=ingredient_id).exists():
+            raise RFError({'ingredients': ['Материала нет в БД.']})
+        if ingredient_id in unique_ingredients:
+            raise RFError({'ingredients': ['Нельзя дублировать материалы.']})
+        unique_ingredients.add(ingredient_id)
+        normalized.append({'id': ingredient_id, 'amount': amount})
+    return normalized
+
 
 
 def validate_tags(data):
-    """Валидация тэгов: отсутствие в request, отсутствие в БД."""
     if not data:
         raise RFError({'tags': ['Обязательное поле.']})
     if len(data) < 1:
